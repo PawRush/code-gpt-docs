@@ -17,12 +17,28 @@ test.describe('Homepage and Main Documentation', () => {
   test('should display main navigation elements', async ({ page }) => {
     await page.goto('/docs/intro');
 
+    // Wait for navbar to load
+    await page.waitForLoadState('networkidle');
+
     // Check navbar elements
-    await expect(page.locator('nav.navbar')).toBeVisible();
-    await expect(page.getByRole('link', { name: /tutorial/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /extension/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /discord/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /login/i })).toBeVisible();
+    const navbar = page.locator('nav.navbar');
+    await expect(navbar).toBeVisible();
+
+    // Check for Tutorial link - may be exact text match required
+    const tutorialLink = page.locator('nav.navbar a:has-text("Tutorial")');
+    await expect(tutorialLink).toBeVisible();
+
+    // Check for Extension link
+    const extensionLink = page.locator('nav.navbar a:has-text("Extension")');
+    await expect(extensionLink).toBeVisible();
+
+    // Check for Discord link
+    const discordLink = page.locator('nav.navbar a:has-text("Discord")');
+    await expect(discordLink).toBeVisible();
+
+    // Check for Login link
+    const loginLink = page.locator('nav.navbar a:has-text("Login")');
+    await expect(loginLink).toBeVisible();
   });
 
   test('should display intro documentation content', async ({ page }) => {
