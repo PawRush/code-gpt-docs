@@ -22,3 +22,7 @@ yarn-error.log*
 # VSCode
 .vscode/settings.json
 .vscode
+
+# playwright
+test-results/
+playwright-report/
