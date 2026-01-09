@@ -28,6 +28,36 @@
 - [x] Finalize Deployment Plan
 - [x] Update README.md
 
+## Pipeline Setup Status
+
+### Phase 1: Gather Context and Configure
+- [ ] Detect existing infrastructure
+- [ ] Use existing CodeConnection
+- [ ] Prepare for pipeline
+
+### Phase 2: Build and Deploy Pipeline
+- [ ] Create CDK Pipeline Stack
+- [ ] CDK Bootstrap
+- [ ] Deploy Pipeline
+- [ ] Monitor Pipeline
+
+### Phase 3: Pipeline Documentation
+- [ ] Finalize Deployment Plan
+- [ ] Update README.md
+
+## Pipeline Configuration
+
+### CodeConnection
+- **ARN**: arn:aws:codeconnections:us-east-1:002255676568:connection/410abcef-5063-4f37-bc14-c33b97f2943e
+- **Status**: (to be verified)
+- **Provider**: GitHub
+
+### Pipeline Details
+- **Pipeline Name**: CodeGPTPipeline
+- **Repository**: davila7/code-gpt-docs
+- **Branch**: deploy-to-aws
+- **App Name**: CodeGPT
+
 ## Configuration
 
 ### Build Configuration
