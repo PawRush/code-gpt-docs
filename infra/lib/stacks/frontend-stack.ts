@@ -20,32 +20,6 @@ export class FrontendStack extends cdk.Stack {
     const isProd = environment === "prod";
     const removalPolicy = isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY;
 
-    // URL rewrite function for static multi-page sites
-    const urlRewriteFunction = new cloudfront.Function(this, "UrlRewriteFunction", {
-      code: cloudfront.FunctionCode.fromInline(`
-        function handler(event) {
-          const request = event.request;
-          const uri = request.uri;
-          // If the URI contains a dot (file extension), pass through
-          if (uri.includes('.')) {
-            return request;
-          }
-          // If the URI ends with a slash, request index.html
-          if (uri.endsWith('/')) {
-            request.uri = uri + 'index.html';
-          } else if (uri !== '/') {
-            // For non-root paths without extensions, try with trailing slash
-            request.uri = uri + '/index.html';
-          } else {
-            // Root path, request /index.html directly
-            request.uri = '/index.html';
-          }
-          return request;
-        }
-      `),
-      comment: "Rewrites /path to /path/index.html",
-    });
-
     // CloudFront to S3 integration
     const cloudfrontToS3 = new CloudFrontToS3(this, "CFToS3", {
       bucketProps: {
@@ -102,14 +76,20 @@ export class FrontendStack extends cdk.Stack {
       cloudFrontDistributionProps: {
         comment: `${id} - ${environment}`,
         defaultRootObject: "index.html",
-        defaultBehavior: {
-          functionAssociations: [
-            {
-              function: urlRewriteFunction,
-              eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-            },
-          ],
-        },
+        errorResponses: [
+          {
+            httpStatus: 403,
+            responseHttpStatus: 200,
+            responsePagePath: "/index.html",
+            ttl: cdk.Duration.minutes(5),
+          },
+          {
+            httpStatus: 404,
+            responseHttpStatus: 200,
+            responsePagePath: "/index.html",
+            ttl: cdk.Duration.minutes(5),
+          },
+        ],
         priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
         enableIpv6: true,
         httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
