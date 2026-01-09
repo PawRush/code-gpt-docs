@@ -11,7 +11,9 @@
     "cdk": "cdk",
     "deploy": "npm run deploy:preview",
     "deploy:preview": "cdk deploy --all --require-approval never --progress events",
+    "deploy:pipeline": "cdk deploy CodeGPTPipelineStack --context codeConnectionArn=arn:aws:codeconnections:us-east-1:002255676568:connection/410abcef-5063-4f37-bc14-c33b97f2943e --context repositoryName=PawRush/code-gpt-docs --context branchName=deploy-to-aws --require-approval never --progress events",
     "destroy": "cdk destroy --all",
+    "destroy:pipeline": "cdk destroy CodeGPTPipelineStack --context codeConnectionArn=arn:aws:codeconnections:us-east-1:002255676568:connection/410abcef-5063-4f37-bc14-c33b97f2943e",
     "synth": "cdk synth",
     "diff": "cdk diff"
   },
