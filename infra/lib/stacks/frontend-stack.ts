@@ -25,10 +25,20 @@ export class FrontendStack extends cdk.Stack {
       code: cloudfront.FunctionCode.fromInline(`
         function handler(event) {
           const request = event.request;
-          let uri = request.uri;
-          if (!uri.includes('.')) {
-            if (!uri.endsWith('/')) uri += '/';
+          const uri = request.uri;
+          // If the URI contains a dot (file extension), pass through
+          if (uri.includes('.')) {
+            return request;
+          }
+          // If the URI ends with a slash, request index.html
+          if (uri.endsWith('/')) {
             request.uri = uri + 'index.html';
+          } else if (uri !== '/') {
+            // For non-root paths without extensions, try with trailing slash
+            request.uri = uri + '/index.html';
+          } else {
+            // Root path, request /index.html directly
+            request.uri = '/index.html';
           }
           return request;
         }
