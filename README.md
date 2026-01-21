@@ -29,11 +29,11 @@ We believe in collaboration and feedback, which is why we encourage you to get i
 
 ## Deployment
 
-Deployed at: https://d38dlm653qket6.cloudfront.net, using the [deploy-frontend-app] Agent Standard Operation Procedure from the [AWS MCP](https://docs.aws.amazon.com/aws-mcp/latest/userguide/what-is-mcp-server.html).
+Pipeline: https://us-east-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/CodeGPTPipeline/view
 
-Deployment command: `./scripts/deploy.sh`
+Deploy: `git push origin deploy-to-aws`
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for full details.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full details. Created with the [setup-pipeline] Agent Standard Operation Procedure from the [AWS MCP](https://docs.aws.amazon.com/aws-mcp/latest/userguide/what-is-mcp-server.html).
 
 ## Reporting Issues on GitHub
 To help us improve CodeGPT, please document issues you encounter by following these steps:

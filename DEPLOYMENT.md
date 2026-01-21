@@ -10,13 +10,14 @@ last_updated: 2026-01-21T22:07:00Z
 
 # Deployment Summary
 
-Your app is deployed to AWS! Preview URL: https://d38dlm653qket6.cloudfront.net
+Your app has a CodePipeline pipeline. Changes on GitHub branch deploy-to-aws will be deployed automatically to production. This is managed by CloudFormation stack CodeGPTPipelineStack.
 
-**Next Step: Automate Deployments**
+**Production URL**: Will be available after pipeline completes first deployment
+**Preview URL**: https://d38dlm653qket6.cloudfront.net (manual deployment)
 
-You're currently using manual deployment. To automate deployments from GitHub, ask your coding agent to set up AWS CodePipeline using an agent SOP for pipeline creation. Try: "create a pipeline using AWS SOPs"
+Pipeline console: https://us-east-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/CodeGPTPipeline/view
 
-Services used: CloudFront, S3, CloudFormation, IAM
+Services used: CodePipeline, CodeBuild, CodeConnections, CloudFront, S3, CloudFormation, IAM
 
 Questions? Ask your Coding Agent:
  - What resources were deployed to AWS?
@@ -25,16 +26,22 @@ Questions? Ask your Coding Agent:
 ## Quick Commands
 
 ```bash
-# View deployment status
+# View pipeline status
+aws codepipeline get-pipeline-state --name "CodeGPTPipeline" --query 'stageStates[*].[stageName,latestExecution.status]' --output table
+
+# View build logs
+aws logs tail "/aws/codebuild/CodeGPTPipelineStack-Synth" --follow
+
+# Trigger pipeline manually
+aws codepipeline start-pipeline-execution --name "CodeGPTPipeline"
+
+# View production deployment status
+aws cloudformation describe-stacks --stack-name "CodeGPTFrontend-prod" --query 'Stacks[0].StackStatus' --output text
+
+# View preview deployment status
 aws cloudformation describe-stacks --stack-name "CodeGPTFrontend-preview-sergeyka" --query 'Stacks[0].StackStatus' --output text
 
-# Invalidate CloudFront cache
-aws cloudfront create-invalidation --distribution-id "E194PNVP6BQW5W" --paths "/*"
-
-# View CloudFront access logs (last hour)
-aws s3 ls "s3://codegptfrontend-preview-s-cftos3cloudfrontloggingb-szibgeowe5em/" --recursive | tail -20
-
-# Redeploy
+# Manual redeploy (preview environment)
 ./scripts/deploy.sh
 ```
 
@@ -116,3 +123,58 @@ None.
 Agent: Claude Sonnet 4.5
 Progress: Completed all phases - deployment successful
 Next: Documentation updates and finalization
+
+---
+
+# Pipeline Deployment Plan: CodeGPT
+
+## Phase 1: Gather Context and Configure
+- [x] Step 0: Inform User of Execution Flow
+- [x] Step 1: Create Deployment Plan
+- [x] Step 2: Detect Existing Infrastructure
+  - [x] 2.1: Detect stacks and frontend
+  - [x] 2.2: Detect app name and git repository
+  - [x] 2.3: Determine quality checks
+  - [x] 2.4: User confirmation
+  - [x] 2.5: Create CodeConnection (using existing)
+
+## Phase 2: Build and Deploy Pipeline
+- [x] Step 3: Create CDK Pipeline Stack
+- [x] Step 4: CDK Bootstrap
+- [x] Step 5: Deploy Pipeline
+  - [x] 5.1: Push to remote
+  - [x] 5.2: Authorize CodeConnection
+  - [x] 5.3: Deploy pipeline stack
+  - [x] 5.4: Trigger pipeline
+- [x] Step 6: Monitor Pipeline
+
+## Phase 3: Documentation
+- [x] Step 7: Finalize Deployment Plan
+- [x] Step 8: Update README.md
+
+## Pipeline Info
+
+- CodeConnection ARN: arn:aws:codeconnections:us-east-1:126593893432:connection/c140aa0c-7407-42c9-aa4b-7c81f5faf40b (AVAILABLE)
+- Repository: PawRush/code-gpt-docs
+- Branch: deploy-to-aws
+- Pipeline Name: CodeGPTPipeline
+- Pipeline ARN: arn:aws:codepipeline:us-east-1:126593893432:CodeGPTPipeline
+- Pipeline URL: https://us-east-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/CodeGPTPipeline/view
+- Quality Checks: None (no lint/unit tests available)
+
+## Pipeline Recovery Guide
+
+```bash
+# Rollback
+cd infra && cdk destroy CodeGPTPipelineStack --context codeConnectionArn=arn:aws:codeconnections:us-east-1:126593893432:connection/c140aa0c-7407-42c9-aa4b-7c81f5faf40b
+
+# Redeploy pipeline
+cd infra && npm run deploy:pipeline
+```
+
+## Pipeline Session Log
+
+### Session 1 - 2026-01-21T22:10:00Z
+Agent: Claude Sonnet 4.5
+Progress: Completed all phases - pipeline setup successful
+Next: Pipeline will automatically deploy on push to deploy-to-aws branch

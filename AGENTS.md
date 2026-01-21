@@ -2,7 +2,9 @@
 
 ## Deployment
 
-See `./DEPLOYMENT.md` for deployment status, logs, troubleshooting, pipeline setup, and next steps.
+See `./DEPLOYMENT.md` for deployment status, logs, troubleshooting, and pipeline details.
+
+**Automated Deployment**: Push to `deploy-to-aws` branch to trigger automatic deployment to production via CodePipeline.
 
 ## Overview
 
