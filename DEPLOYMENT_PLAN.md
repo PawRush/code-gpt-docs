@@ -5,7 +5,7 @@ app_name: CodeGPT
 app_type: Frontend Application (Docusaurus)
 branch: main
 created: 2026-01-21T21:53:00Z
-last_updated: 2026-01-21T22:00:00Z
+last_updated: 2026-01-21T22:07:00Z
 ---
 
 # Deployment Plan: CodeGPT Docs
@@ -29,8 +29,8 @@ Coding Agents should follow this Deployment Plan, and validate previous progress
 - [x] Step 9: Validate CDK Synth
 
 ## Phase 3: Deploy and Validate
-- [ ] Step 10: Execute CDK Deployment
-- [ ] Step 11: Validate CloudFormation Stack
+- [x] Step 10: Execute CDK Deployment
+- [x] Step 11: Validate CloudFormation Stack
 
 ## Phase 4: Update Documentation
 - [ ] Step 12: Finalize Deployment Plan
@@ -38,12 +38,13 @@ Coding Agents should follow this Deployment Plan, and validate previous progress
 
 ## Deployment Info
 
-- Deployment URL: (pending)
-- Stack name: (pending)
-- CloudFront Distribution ID: (pending)
-- S3 Bucket Name: (pending)
-- S3 Log Bucket: (pending)
-- CloudFront Log Bucket: (pending)
+- Deployment URL: https://d38dlm653qket6.cloudfront.net
+- Stack name: CodeGPTFrontend-preview-sergeyka
+- CloudFront Distribution ID: E194PNVP6BQW5W
+- S3 Bucket Name: codegptfrontend-preview-ser-cftos3s3bucketcae9f2be-6iht8ctnqdwc
+- S3 Log Bucket: codegptfrontend-preview-s-cftos3s3loggingbucket64b-3plxvpl0crxg
+- CloudFront Log Bucket: codegptfrontend-preview-s-cftos3cloudfrontloggingb-szibgeowe5em
+- Deployment Timestamp: 2026-01-21T22:06:45Z
 
 ## Build Configuration
 
