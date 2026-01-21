@@ -8,6 +8,47 @@ created: 2026-01-21T21:53:00Z
 last_updated: 2026-01-21T22:07:00Z
 ---
 
+# Deployment Summary
+
+Your app is deployed to AWS! Preview URL: https://d38dlm653qket6.cloudfront.net
+
+**Next Step: Automate Deployments**
+
+You're currently using manual deployment. To automate deployments from GitHub, ask your coding agent to set up AWS CodePipeline using an agent SOP for pipeline creation. Try: "create a pipeline using AWS SOPs"
+
+Services used: CloudFront, S3, CloudFormation, IAM
+
+Questions? Ask your Coding Agent:
+ - What resources were deployed to AWS?
+ - How do I update my deployment?
+
+## Quick Commands
+
+```bash
+# View deployment status
+aws cloudformation describe-stacks --stack-name "CodeGPTFrontend-preview-sergeyka" --query 'Stacks[0].StackStatus' --output text
+
+# Invalidate CloudFront cache
+aws cloudfront create-invalidation --distribution-id "E194PNVP6BQW5W" --paths "/*"
+
+# View CloudFront access logs (last hour)
+aws s3 ls "s3://codegptfrontend-preview-s-cftos3cloudfrontloggingb-szibgeowe5em/" --recursive | tail -20
+
+# Redeploy
+./scripts/deploy.sh
+```
+
+## Production Readiness
+
+For production deployments, consider:
+- WAF Protection: Add AWS WAF with managed rules (Core Rule Set, Known Bad Inputs) and rate limiting
+- CSP Headers: Configure Content Security Policy in CloudFront response headers (`script-src 'self'`, `frame-ancestors 'none'`)
+- Custom Domain: Set up Route 53 and ACM certificate
+- Monitoring: CloudWatch alarms for 4xx/5xx errors and CloudFront metrics
+- Auth Redirect URLs: If using an auth provider (Auth0, Supabase, Firebase, Lovable, etc.), add your CloudFront URL to allowed redirect URLs
+
+---
+
 # Deployment Plan: CodeGPT Docs
 
 Coding Agents should follow this Deployment Plan, and validate previous progress if picking up the Deployment in a new coding session.
@@ -33,8 +74,8 @@ Coding Agents should follow this Deployment Plan, and validate previous progress
 - [x] Step 11: Validate CloudFormation Stack
 
 ## Phase 4: Update Documentation
-- [ ] Step 12: Finalize Deployment Plan
-- [ ] Step 13: Update README.md
+- [x] Step 12: Finalize Deployment Plan
+- [x] Step 13: Update README.md
 
 ## Deployment Info
 
@@ -59,7 +100,7 @@ Coding Agents should follow this Deployment Plan, and validate previous progress
 
 ```bash
 # Rollback
-cd infra && cdk destroy "CodeGPTFrontend-preview-$(whoami)"
+cd infra && cdk destroy "CodeGPTFrontend-preview-sergeyka"
 
 # Redeploy
 ./scripts/deploy.sh
@@ -73,5 +114,5 @@ None.
 
 ### Session 1 - 2026-01-21T21:53:00Z
 Agent: Claude Sonnet 4.5
-Progress: Completed Phase 1 - Context gathering, build configuration detection, prerequisites validation
-Next: Phase 2 - Build CDK infrastructure
+Progress: Completed all phases - deployment successful
+Next: Documentation updates and finalization
