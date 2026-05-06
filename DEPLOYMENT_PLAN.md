@@ -74,13 +74,17 @@
 - Branch: deploy-to-aws-20260506_150212-kamielw
 - Quality checks: Secret scanning + build verification only
 
-**2.5: Verify CodeConnection** ⏳
+**2.5: Verify CodeConnection** ✅
+- Old connection was in ERROR state (arn:...b42cc9f5a026)
+- Created new CodeConnection: CodeGpt-pipeline
+- New Connection ARN: arn:aws:codeconnections:eu-central-1:189681391221:connection/d9ee5315-7c13-49bf-b739-8e2900df6fe9
+- Status: PENDING (authorization required before deployment)
 
 ---
 
 ## Configuration
 
-**CodeConnection ARN**: arn:aws:codeconnections:eu-central-1:189681391221:connection/ee7a600a-99ab-4b3a-bf6c-b42cc9f5a026
+**CodeConnection ARN**: arn:aws:codeconnections:eu-central-1:189681391221:connection/d9ee5315-7c13-49bf-b739-8e2900df6fe9
 **Branch**: deploy-to-aws-20260506_150212-kamielw
 **Repository**: PawRush/code-gpt-docs
 **Region**: eu-central-1
@@ -92,4 +96,10 @@
 
 ## Issues
 
-None yet.
+### Issue 1: CodeConnection in ERROR state
+- **Status**: Blocked
+- **Description**: Existing CodeConnection (arn:aws:codeconnections:eu-central-1:189681391221:connection/ee7a600a-99ab-4b3a-bf6c-b42cc9f5a026) is in ERROR state
+- **Resolution Options**:
+  1. Re-authorize existing connection via AWS Console
+  2. Delete and create new connection
+- **Next Step**: User decision required
