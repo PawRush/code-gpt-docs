@@ -20,7 +20,7 @@
   - [ ] 2.6: Ensure production secrets (if needed)
 
 ### Phase 2: Build and Deploy Pipeline
-- [ ] Step 3: Create CDK Pipeline Stack
+- [x] Step 3: Create CDK Pipeline Stack
 - [ ] Step 4: CDK Bootstrap
 - [ ] Step 5: Deploy Pipeline
   - [ ] 5.1: Push to remote
