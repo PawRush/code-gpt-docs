@@ -3,11 +3,17 @@
 
 ## Deployment
 
-Deployed at: https://d2wsnovhvuyxre.cloudfront.net, using the [deploy-frontend-app] Agent Standard Operation Procedure from the [AWS MCP](https://docs.aws.amazon.com/aws-mcp/latest/userguide/what-is-mcp-server.html).
+**Preview Environment:** https://d2wsnovhvuyxre.cloudfront.net
 
-Deployment command: `./scripts/deploy.sh`
+**Production Pipeline:** https://eu-central-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/CodeGptPipeline/view
+
+**Deploy to Production:** `git push origin deploy-to-aws-20260506_150212-kamielw`
+
+**Manual Preview Deploy:** `./scripts/deploy.sh`
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for full details.
+
+Created with the [deploy-frontend-app] and [setup-pipeline] Agent Standard Operation Procedures from the [AWS MCP](https://docs.aws.amazon.com/aws-mcp/latest/userguide/what-is-mcp-server.html).
 
 <img width="1037" height="581" alt="Screenshot 2025-07-17 at 09 00 49" src="https://github.com/user-attachments/assets/77cc527c-c023-42bc-a593-58932b05d07c" />
 

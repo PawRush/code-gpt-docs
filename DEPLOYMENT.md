@@ -1,168 +1,165 @@
 # Deployment Summary
 
-Your app is deployed to AWS! Preview URL: https://d2wsnovhvuyxre.cloudfront.net
+Your app has a CodePipeline pipeline. Changes pushed to GitHub branch **deploy-to-aws-20260506_150212-kamielw** will be deployed automatically once the CodeConnection is authorized. This is managed by CloudFormation stack **CodeGptPipelineStack**.
 
-**Next Step: Automate Deployments**
+**Pipeline Console:** https://eu-central-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/CodeGptPipeline/view
 
-You're currently using manual deployment. To automate deployments from GitHub, ask your coding agent to set up AWS CodePipeline using an agent SOP for pipeline creation. Try: "create a pipeline using AWS SOPs"
+**Current Status:** Pipeline deployed successfully. ⚠️ **Action Required:** Authorize CodeConnection before first execution (see below).
 
-Services used: CloudFront, S3, CloudFormation, IAM
+Services used: CodePipeline, CodeBuild, CodeConnections, CloudFormation, IAM
 
 Questions? Ask your Coding Agent:
- - What resources were deployed to AWS?
- - How do I update my deployment?
+ - How can I change the source branch?
+ - What's the difference between preview and prod URLs?
 
 ## Quick Commands
 
 ```bash
-# View deployment status
-aws cloudformation describe-stacks --stack-name "CodeGPTFrontend-preview-kamielw" --region eu-central-1 --query 'Stacks[0].StackStatus' --output text
+# View pipeline status
+aws codepipeline get-pipeline-state --name "CodeGptPipeline" --region eu-central-1 --query 'stageStates[*].[stageName,latestExecution.status]' --output table
 
-# Invalidate CloudFront cache
-aws cloudfront create-invalidation --distribution-id "E371MFO5722Q8G" --paths "/*"
+# View build logs
+aws logs tail "/aws/codebuild/CodeGptPipelineStack-Synth" --region eu-central-1 --follow
 
-# View CloudFront access logs (last hour)
-aws s3 ls "s3://codegptfrontend-preview-k-cftos3cloudfrontloggingb-5n649y5rojxk/" --region eu-central-1 --recursive | tail -20
+# Trigger pipeline manually
+aws codepipeline start-pipeline-execution --name "CodeGptPipeline" --region eu-central-1
 
-# Redeploy
+# Deploy to preview environment (manual)
 ./scripts/deploy.sh
 ```
 
-## Production Readiness
+## ⚠️ Required: Authorize CodeConnection
 
-For production deployments, consider:
-- WAF Protection: Add AWS WAF with managed rules (Core Rule Set, Known Bad Inputs) and rate limiting
-- CSP Headers: Configure Content Security Policy in CloudFront response headers (`script-src 'self'`, `frame-ancestors 'none'`)
-- Custom Domain: Set up Route 53 and ACM certificate
-- Monitoring: CloudWatch alarms for 4xx/5xx errors and CloudFront metrics
-- Auth Redirect URLs: If using an auth provider (Auth0, Supabase, Firebase, Lovable, etc.), add your CloudFront URL to allowed redirect URLs
+Before the pipeline can execute, you must authorize the CodeConnection with GitHub:
 
----
+**Authorization URL:**
+```
+https://eu-central-1.console.aws.amazon.com/codesuite/settings/connections
+```
 
-# Deployment Plan
+**Steps:**
+1. Find connection: **CodeGpt-pipeline**
+2. Status should show: **PENDING**
+3. Click "**Update pending connection**"
+4. Click "**Install a new app**" → Select your GitHub account
+5. Authorize AWS Connector for GitHub
+6. Grant access to repository: **PawRush/code-gpt-docs**
+7. Verify status changes to: **AVAILABLE**
 
-## Phase 1: Prerequisites Check ✅
+**Verify authorization:**
+```bash
+aws codeconnections get-connection --connection-arn "arn:aws:codeconnections:eu-central-1:189681391221:connection/d9ee5315-7c13-49bf-b739-8e2900df6fe9" --region eu-central-1 --query 'Connection.ConnectionStatus' --output text
+```
 
-**Status**: Completed
+Expected output: `AVAILABLE`
 
-### Prerequisites Verified:
-- ✅ AWS CLI: v1.42.6 installed
-- ✅ Package Manager: npm v11.6.2 installed  
-- ✅ AWS Credentials: Configured for account 189681391221 (Admin role)
-
----
-
-## Phase 2: Codebase Analysis ✅
-
-**Status**: Completed
-
-### Application Type Determined:
-- **Type**: Static Site Generator (Docusaurus v2.4.0)
-- **Framework**: React + Docusaurus
-- **Build Output**: Static files via `docusaurus build`
-- **Deployment Strategy**: Frontend static hosting
-
-### Key Findings:
-- No backend/SSR dependencies detected
-- No Supabase integration detected
-- Pure static documentation site
-- Build command: `npm run build` → outputs to `build/` directory
-
-### Routing Decision:
-✅ Application is **supported** - routing to `deploy-frontend-app` SOP
+**After authorization:** Push a commit to trigger the pipeline:
+```bash
+git push origin deploy-to-aws-20260506_150212-kamielw
+```
 
 ---
 
-## Phase 3: Specialized Deployment - Frontend App
+# Pipeline Deployment Details
 
-**Status**: Completed
+## Configuration
 
-Executing `deploy-frontend-app` SOP with the following phases:
+**CodeConnection ARN**: arn:aws:codeconnections:eu-central-1:189681391221:connection/d9ee5315-7c13-49bf-b739-8e2900df6fe9  
+**Branch**: deploy-to-aws-20260506_150212-kamielw  
+**Repository**: PawRush/code-gpt-docs  
+**Region**: eu-central-1  
+**Account**: 189681391221  
+**Package Manager**: npm  
+**App Name**: CodeGpt  
+**Pipeline Name**: CodeGptPipeline  
+**Stack Name**: CodeGptPipelineStack
 
-### Phase 1: Gather Context and Configure ✅
-- [x] Update deployment plan with detailed phases
-- [x] Create deploy branch: `deploy-to-aws-20260506_150212-kamielw`
-- [x] Detect build configuration
-- [x] Validate prerequisites
-- [x] Revisit deployment plan
+## Pipeline Stages
 
-**Build Configuration Detected:**
-- Framework: Docusaurus v2.4.0
-- Package Manager: npm
-- Build Command: `npm run build`
-- Output Directory: `build/`
-- Base Path: `/` (root)
-- Trailing Slash: Default (undefined, treated as true)
-- CloudFront Routing: URL rewrite function for `/path/index.html`
-- Lint: Not configured
+1. **Source**: Pull from GitHub via CodeConnection (triggers on push)
+2. **Build (Synth)**: 
+   - Install dependencies (npm install)
+   - Run secret scanning (@secretlint/quick-start)
+   - Build frontend (npm run build)
+   - Synthesize CDK (cdk synth)
+3. **UpdatePipeline**: Self-mutation (updates pipeline if infrastructure changes)
+4. **Assets**: Publish CDK assets to S3
+5. **Deploy**: Deploy CodeGPTFrontend-prod stack
+   - CloudFront distribution
+   - S3 bucket with content
+   - Security policies and logging
 
-**Prerequisites Validated:**
-- ✅ AWS CLI: v1.42.6
-- ✅ AWS Credentials: Account 189681391221
-- ✅ Package Manager: npm v11.6.2
-- ✅ Build: Succeeds, outputs to `build/`
-- ✅ CDK CLI: v2.1031.0
-- ✅ Git: Clean (except modified package-lock.json from npm install)
+## Deployment History
 
-### Phase 2: Build CDK Infrastructure ✅
-- [x] Initialize CDK foundation
-- [x] Generate CDK stack
-- [x] Create deployment script
-- [x] Validate CDK synth
+### 2026-05-06 - Pipeline Setup Completed
 
-**CDK Infrastructure Created:**
-- Stack: `CodeGPTFrontend-preview-kamielw`
-- CloudFront distribution with URL rewrite function for Docusaurus routing
-- S3 bucket with Origin Access Control (OAC)
-- Content Security Policy via CloudFront Function
-- Access logging buckets for S3 and CloudFront
-- Deployment script: `scripts/deploy.sh`
+**Phase 1: Gather Context and Configure** ✅
 
-### Phase 3: Deploy and Validate ✅
-- [x] Execute CDK deployment
-- [x] Validate CloudFormation stack
+- Detected infrastructure: FrontendStack (Docusaurus v2.4.0)
+- No backend/Lambda functions
+- No lint/test scripts configured
+- Package manager: npm
+- Created new CodeConnection (old one in ERROR state)
 
-**Deployment Results:**
-- Stack Name: `CodeGPTFrontend-preview-kamielw`
-- Stack Status: CREATE_COMPLETE
-- Region: eu-central-1
-- Website URL: https://d2wsnovhvuyxre.cloudfront.net
-- Distribution ID: E371MFO5722Q8G
-- Distribution Status: Deployed
-- S3 Bucket: codegptfrontend-preview-kam-cftos3s3bucketcae9f2be-p0ow6swpeh3k
-- CloudFront Log Bucket: codegptfrontend-preview-k-cftos3cloudfrontloggingb-5n649y5rojxk
-- S3 Log Bucket: codegptfrontend-preview-k-cftos3s3loggingbucket64b-qfc8litqhdue
-- Deployment Timestamp: 2026-05-06 16:11:03 GMT
+**Phase 2: Build and Deploy Pipeline** ✅
 
-**Validation Checks:**
-- ✅ CloudFront URL returns 200 OK
-- ✅ Distribution status: Deployed
-- ✅ S3 bucket contains build files
+- Created CDK Pipeline Stack
+- Bootstrapped CDK environment
+- Deployed CodeGptPipelineStack successfully
+- Pipeline triggered automatically (failed at Source - authorization pending)
 
-### Phase 4: Update Documentation ✅
-- [x] Finalize deployment plan
-- [x] Update README.md
+**Phase 3: Documentation** ✅
+
+- Created DEPLOYMENT.md
+- Updated README.md with pipeline section
+
+## Production Deployment
+
+The pipeline deploys to **prod** environment when changes are pushed to the configured branch.
+
+**Production Stack**: CodeGPTFrontend-prod  
+**CloudFront Distribution**: (will be created on first successful pipeline run)  
+**S3 Bucket**: (will be created on first successful pipeline run)
+
+## Troubleshooting
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| Pipeline failed at Source | CodeConnection not authorized | Visit https://eu-central-1.console.aws.amazon.com/codesuite/settings/connections and authorize CodeGpt-pipeline |
+| Pipeline failed at Build/Synth | Build errors, CDK synth errors | View logs: `aws logs tail "/aws/codebuild/CodeGptPipelineStack-Synth" --region eu-central-1 --follow` |
+| Stack deployment failed | IAM permissions, resource conflicts | View events: `aws cloudformation describe-stack-events --stack-name "CodeGPTFrontend-prod" --region eu-central-1` |
+| Self-mutation loop | Non-deterministic synth output | Ensure CDK synth produces identical output each run |
+| Stale content after deploy | CloudFront cache | Get distribution ID from stack outputs, then invalidate: `aws cloudfront create-invalidation --distribution-id "<ID>" --paths "/*"` |
+
+## Manual Deployment
+
+For testing or emergency deployments, you can still deploy manually:
+
+```bash
+# Preview environment (your personal stack)
+./scripts/deploy.sh
+
+# Production environment (via pipeline only - don't deploy manually)
+```
+
+## Pipeline Management
+
+**View pipeline:**
+```bash
+aws codepipeline get-pipeline --name "CodeGptPipeline" --region eu-central-1
+```
+
+**Stop execution:**
+```bash
+aws codepipeline stop-pipeline-execution --pipeline-name "CodeGptPipeline" --pipeline-execution-id "<execution-id>" --region eu-central-1 --abandon
+```
+
+**Delete pipeline:**
+```bash
+cd infra
+npm run destroy:pipeline
+```
 
 ---
 
-## Phase 1 Checkpoint ✅
-
-All Phase 1 steps completed successfully. Proceeding to Phase 2.
-
----
-
-## Phase 2 Checkpoint ✅
-
-All Phase 2 steps completed successfully. Proceeding to Phase 3.
-
----
-
-## Phase 3 Checkpoint ✅
-
-All Phase 3 steps completed successfully. Proceeding to Phase 4.
-
----
-
-## Phase 4 Checkpoint ✅
-
-All Phase 4 steps completed successfully. Deployment complete!
+Created with the [setup-pipeline] Agent Standard Operation Procedure from the [AWS MCP](https://docs.aws.amazon.com/aws-mcp/latest/userguide/what-is-mcp-server.html).
