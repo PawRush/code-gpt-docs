@@ -1,6 +1,14 @@
 # CodeGPT Plus 
 [Visit our website](https://codegpt.co)
 
+## Deployment
+
+Deployed at: https://d2wsnovhvuyxre.cloudfront.net, using the [deploy-frontend-app] Agent Standard Operation Procedure from the [AWS MCP](https://docs.aws.amazon.com/aws-mcp/latest/userguide/what-is-mcp-server.html).
+
+Deployment command: `./scripts/deploy.sh`
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full details.
+
 <img width="1037" height="581" alt="Screenshot 2025-07-17 at 09 00 49" src="https://github.com/user-attachments/assets/77cc527c-c023-42bc-a593-58932b05d07c" />
 
 --- 
