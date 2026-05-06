@@ -8,6 +8,8 @@
     "cdk": "cdk",
     "deploy": "npm run deploy:preview",
     "deploy:preview": "cdk deploy --all --require-approval never --progress events",
+    "deploy:pipeline": "cdk deploy CodeGptPipelineStack --context codeConnectionArn=arn:aws:codeconnections:eu-central-1:189681391221:connection/d9ee5315-7c13-49bf-b739-8e2900df6fe9 --context repositoryName=PawRush/code-gpt-docs --context branchName=deploy-to-aws-20260506_150212-kamielw --require-approval never --progress events",
+    "destroy:pipeline": "cdk destroy CodeGptPipelineStack --context codeConnectionArn=arn:aws:codeconnections:eu-central-1:189681391221:connection/d9ee5315-7c13-49bf-b739-8e2900df6fe9",
     "destroy": "cdk destroy --all",
     "synth": "cdk synth",
     "diff": "cdk diff"
